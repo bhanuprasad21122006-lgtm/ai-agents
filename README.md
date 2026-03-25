@@ -279,7 +279,8 @@ This project shows how coordinated AI agents can simulate complex production tea
 
 It serves as a blueprint for future **autonomous software production studios**.
 
----# 2-Minute Demo Pitch Script — AAA Game Studio Multi-Agent Orchestrator
+---
+# 2-Minute Demo Pitch Script — AAA Game Studio Multi-Agent Orchestrator
 
 Hello everyone,
 
