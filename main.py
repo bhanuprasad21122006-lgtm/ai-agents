@@ -28,6 +28,17 @@ async def main():
     print("🚀 Initializing AAA Game Studio Orchestrator...")
     load_dotenv()
     
+    # Check if user added an API Key before instantiating any models
+    api_key = os.getenv("GEMINI_API_KEY", "")
+    if not api_key or api_key == "your_gemini_api_key_here":
+        print("🔑 No Gemini API key found.")
+        api_key = input("Please paste your Gemini API Key to continue (or press Enter to exit):\n> ").strip()
+        if not api_key:
+            print("❌ Exiting. A valid API key is required.")
+            return
+        
+        # Set it in the environment so the ADK can pick it up
+        os.environ["GEMINI_API_KEY"] = api_key
     # Initialize MCP Server connection for local tools
     mcp_bridge = MCPToolBridge()
     # mcp_client = await mcp_bridge.initialize() # Uncomment when MCP server is ready
@@ -91,12 +102,6 @@ async def main():
     print("✅ Pipeline Ready.")
     print("========================================================")
     
-    # Check if user added an API Key
-    api_key = os.getenv("GEMINI_API_KEY", "")
-    if not api_key or api_key == "your_gemini_api_key_here":
-        print("⚠️ DRY RUN MODE ACTIVE - Execution requires a valid GEMINI_API_KEY in the .env file.")
-        print("To test the interactive mode, please enter your API key.\n")
-        return
 
     # Interactive Prompt
     print("Welcome to the AAA Game Builder AI!")
@@ -132,10 +137,47 @@ async def main():
             print_event(event)
                 
         print("\n✅ Game Generation Complete! All requested code has been outputted above.")
+        
+        # Check if a game was generated
+        generated_path = os.environ.get("GENERATED_GAME_PATH")
+        if generated_path and os.path.exists(generated_path):
+            download = input("\n🎮 Game successfully generated! Would you like to download/save it? (y/n): ")
+            if download.lower() == 'y':
+                import tkinter as tk
+                from tkinter import filedialog
+                import shutil
+                
+                # Hide the main tkinter window
+                root = tk.Tk()
+                root.withdraw()
+                # Ensure the dialog appears on top
+                root.attributes('-topmost', True)
+                
+                # Suggest the original filename
+                suggested_name = os.path.basename(generated_path)
+                
+                save_path = filedialog.asksaveasfilename(
+                    title="Save Generated Game",
+                    initialfile=suggested_name,
+                    defaultextension=".py",
+                    filetypes=[("Python Files", "*.py"), ("All Files", "*.*")]
+                )
+                
+                if save_path:
+                    shutil.copy2(generated_path, save_path)
+                    print(f"✅ Game saved to: {save_path}")
+                else:
+                    print("❌ Save cancelled.")
+        else:
+            print("\n⚠️ The AI did not generate a final playable code file this time.")
+                    
     except Exception as e:
         print(f"\n❌ Execution Error: {e}")
         import traceback
         traceback.print_exc()
+
+    # Prevent the terminal window from closing immediately if double-clicked
+    input("\nPress Enter to exit...")
 
 if __name__ == "__main__":
     asyncio.run(main())

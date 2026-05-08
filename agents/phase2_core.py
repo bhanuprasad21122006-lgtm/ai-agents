@@ -1,16 +1,21 @@
 import os
+import tempfile
 from google.adk.agents import LlmAgent
 
 def write_game_code(filename: str, python_code: str) -> str:
-    """Saves the final playable game code into the 'generated_game' folder. Use this tool heavily to output code!
+    """Saves the final playable game code into a temporary folder. Use this tool heavily to output code!
     Args:
         filename: name of the python file (e.g. game.py)
         python_code: the full, runnable python source code for the generated game
     """
-    os.makedirs("generated_game", exist_ok=True)
-    filepath = os.path.join("generated_game", filename)
+    temp_dir = tempfile.gettempdir()
+    filepath = os.path.join(temp_dir, filename)
     with open(filepath, "w", encoding="utf-8") as f:
         f.write(python_code)
+    
+    # Store the generated path in an environment variable so the main loop can find it
+    os.environ["GENERATED_GAME_PATH"] = filepath
+    
     return f"Successfully saved runnable code to {filepath}"
 
 # ==========================================
