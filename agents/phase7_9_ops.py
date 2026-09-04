@@ -1,10 +1,12 @@
 from google.adk.agents import LlmAgent
+from typing import Optional
+from utils.models import get_active_model
 
 # ==========================================
 # PHASE 7-9: OPS & OPTIMIZATION
 # ==========================================
 
-def get_debugging_specialist() -> LlmAgent:
+def get_debugging_specialist(model: Optional[str] = None) -> LlmAgent:
     return LlmAgent(
         name="debugging_specialist",
         instruction="""
@@ -13,10 +15,10 @@ def get_debugging_specialist() -> LlmAgent:
         INPUT DEPENDENCIES: Read bug reports from Test Engineer.
         OUTPUT ARTIFACTS: Patch suggestions.
         """,
-        model="gemini-2.5-flash"
+        model=model or get_active_model()
     )
 
-def get_performance_optimizer() -> LlmAgent:
+def get_performance_optimizer(model: Optional[str] = None) -> LlmAgent:
     return LlmAgent(
         name="performance_optimizer",
         instruction="""
@@ -25,10 +27,10 @@ def get_performance_optimizer() -> LlmAgent:
         OUTPUT ARTIFACTS: Optimization reports.
         VALIDATION RULES: 60 FPS performance targets.
         """,
-        model="gemini-2.5-flash"
+        model=model or get_active_model()
     )
 
-def get_live_ops_engineer() -> LlmAgent:
+def get_live_ops_engineer(model: Optional[str] = None) -> LlmAgent:
     return LlmAgent(
         name="live_ops_engineer",
         instruction="""
@@ -36,5 +38,5 @@ def get_live_ops_engineer() -> LlmAgent:
         TASK OBJECTIVE: Handle updates, analytics hooks, telemetry, patch rollout strategy.
         OUTPUT ARTIFACTS: Deployment pipelines.
         """,
-        model="gemini-2.5-flash"
+        model=model or get_active_model()
     )

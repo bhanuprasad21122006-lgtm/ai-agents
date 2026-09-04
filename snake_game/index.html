@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Arcade Snake</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="arcade-container">
+        <!-- Arcade Header / Title -->
+        <header class="game-header">
+            <h1 class="glitch-title" data-text="NEON SNAKE">NEON SNAKE</h1>
+            <button id="mute-btn" class="icon-btn" aria-label="Toggle Mute">
+                <span id="mute-icon">🔊</span>
+            </button>
+        </header>
+
+        <!-- HUD Panel: Stats & Scoreboard -->
+        <section class="hud-panel">
+            <div class="hud-box">
+                <span class="hud-label">SCORE</span>
+                <span id="score-val" class="hud-value color-cyan">0</span>
+            </div>
+            <div class="hud-box">
+                <span class="hud-label">HIGH SCORE</span>
+                <span id="highscore-val" class="hud-value color-gold">0</span>
+            </div>
+            <div class="hud-box">
+                <span class="hud-label">LEVEL</span>
+                <span id="level-val" class="hud-value color-magenta">1</span>
+            </div>
+            <div class="hud-box">
+                <span class="hud-label">SPEED</span>
+                <span id="speed-val" class="hud-value color-green">100%</span>
+            </div>
+        </section>
+
+        <!-- Canvas Game Frame Wrapper -->
+        <div class="canvas-wrapper" id="canvas-wrapper">
+            <canvas id="game-canvas" width="400" height="400"></canvas>
+
+            <!-- Overlay Modals -->
+            <!-- Start Screen Overlay -->
+            <div id="start-overlay" class="modal-overlay active">
+                <div class="modal-card">
+                    <h2 class="modal-title color-cyan">CYBER SNAKE</h2>
+                    <p class="modal-desc">Navigate the grid, absorb neon energy cells, and evolve.</p>
+                    <div class="controls-guide">
+                        <div class="guide-item"><span class="key-cap">W A S D</span> or <span class="key-cap">↑ ↓ ← →</span> Move</div>
+                        <div class="guide-item"><span class="key-cap">SPACE</span> Pause / Resume</div>
+                        <div class="guide-item"><span class="key-cap">R</span> Restart</div>
+                    </div>
+                    <button id="overlay-start-btn" class="btn btn-primary">START GAME</button>
+                </div>
+            </div>
+
+            <!-- Pause Screen Overlay -->
+            <div id="pause-overlay" class="modal-overlay hidden">
+                <div class="modal-card glassmorphism">
+                    <h2 class="modal-title color-gold">PAUSED</h2>
+                    <p class="modal-desc">System paused. Press SPACE or click Resume to continue.</p>
+                    <button id="overlay-resume-btn" class="btn btn-secondary">RESUME</button>
+                </div>
+            </div>
+
+            <!-- Game Over Screen Overlay -->
+            <div id="gameover-overlay" class="modal-overlay hidden">
+                <div class="modal-card">
+                    <h2 class="modal-title color-magenta">SYSTEM CRASH</h2>
+                    <p class="modal-subtitle">COLLISION DETECTED</p>
+                    <div id="new-high-badge" class="high-score-badge hidden">🏆 NEW HIGH SCORE!</div>
+                    <div class="gameover-stats">
+                        <div class="stat-row">
+                            <span>Final Score:</span>
+                            <span id="final-score" class="color-cyan">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Level Reached:</span>
+                            <span id="final-level" class="color-magenta">1</span>
+                        </div>
+                        <div class="stat-row">
+                            <span>Best Score:</span>
+                            <span id="final-highscore" class="color-gold">0</span>
+                        </div>
+                    </div>
+                    <button id="overlay-restart-btn" class="btn btn-primary">PLAY AGAIN</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Control Buttons -->
+        <div class="controls-bar">
+            <button id="start-btn" class="btn btn-action">Start</button>
+            <button id="pause-btn" class="btn btn-action" disabled>Pause</button>
+            <button id="restart-btn" class="btn btn-action">Restart</button>
+        </div>
+
+        <!-- Touch Controls for Mobile Devices -->
+        <div class="dpad-container">
+            <button class="dpad-btn dpad-up" id="btn-up" aria-label="Up">▲</button>
+            <div class="dpad-middle">
+                <button class="dpad-btn dpad-left" id="btn-left" aria-label="Left">◀</button>
+                <div class="dpad-center"></div>
+                <button class="dpad-btn dpad-right" id="btn-right" aria-label="Right">▶</button>
+            </div>
+            <button class="dpad-btn dpad-down" id="btn-down" aria-label="Down">▼</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

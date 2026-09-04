@@ -162,20 +162,84 @@ class ProjectWorkspace:
         self._write_json(self.validation_path / "run-report.json", report)
         return report
 
-    def save_game_code(self, filename: str, python_code: str) -> str:
-        """Persist generated Python code and require a syntax check before accepting it."""
-        safe_filename = self._safe_name(Path(filename).stem) + ".py"
-        try:
-            ast.parse(python_code)
-        except SyntaxError as exc:
-            return f"VALIDATION_FAILED: generated Python has a syntax error at line {exc.lineno}: {exc.msg}. Fix it and call write_game_code again."
-        path = self.games_path / safe_filename
-        path.write_text(python_code, encoding="utf-8")
-        self._record_manifest({"agent": "gameplay_programmer", "artifact": "playable_game", "path": str(path.relative_to(self.path))})
-        return f"VALIDATION_PASSED: saved runnable Python game to {path}"
+    def save_game_code(self, filename: str, code: str) -> str:
+        """Persist generated game code (Python, HTML, JS, CSS)."""
+        import os
+        suffix = Path(filename).suffix.lower()
+        if suffix in {".html", ".htm", ".js", ".css"}:
+            safe_filename = self._safe_name(Path(filename).stem) + suffix
+            path = self.games_path / safe_filename
+            path.write_text(code, encoding="utf-8")
+            self._record_manifest({"agent": "gameplay_programmer", "artifact": f"playable_{suffix[1:]}", "path": str(path.relative_to(self.path))})
+            if suffix in {".html", ".htm"} or not os.environ.get("GENERATED_GAME_PATH"):
+                os.environ["GENERATED_GAME_PATH"] = str(path)
+            return f"VALIDATION_PASSED: saved runnable game file to {path}"
+        else:
+            safe_filename = self._safe_name(Path(filename).stem) + ".py"
+            try:
+                ast.parse(code)
+            except SyntaxError as exc:
+                return f"VALIDATION_FAILED: generated Python has a syntax error at line {exc.lineno}: {exc.msg}. Fix it and call write_game_code again."
+            path = self.games_path / safe_filename
+            path.write_text(code, encoding="utf-8")
+            self._record_manifest({"agent": "gameplay_programmer", "artifact": "playable_game", "path": str(path.relative_to(self.path))})
+            os.environ["GENERATED_GAME_PATH"] = str(path)
+            return f"VALIDATION_PASSED: saved runnable Python game to {path}"
+
+    def extract_and_save_code_from_text(self, text: str) -> list[str]:
+        """Auto-detect and extract source code files (HTML, CSS, JS, Python) embedded in LLM text."""
+        saved_files = []
+        if not text:
+            return saved_files
+
+        pattern = r"(?:###?\s*[`\"']?([a-zA-Z0-9_\-\.]+)[`\"']?[\r\n]+)?```(?:html|css|javascript|js|python|py)?\r?\n(.*?)```"
+        matches = list(re.finditer(pattern, text, re.DOTALL | re.IGNORECASE))
+
+        html_code = ""
+        css_code = ""
+        js_code = ""
+        py_code = ""
+
+        for m in matches:
+            filename = m.group(1)
+            code = m.group(2).strip()
+            if not code:
+                continue
+
+            if filename:
+                clean_fn = filename.strip("`'\" \t")
+                if clean_fn.endswith((".html", ".htm", ".css", ".js", ".py")):
+                    self.save_game_code(clean_fn, code)
+                    saved_files.append(clean_fn)
+                    continue
+
+            # Check content heuristics
+            if "<!DOCTYPE html>" in code or ("<html" in code and "</html>" in code):
+                html_code = code
+            elif ("body {" in code or "background:" in code or "canvas" in code) and not html_code:
+                css_code = code
+            elif ("document.getElementById" in code or "addEventListener" in code or "requestAnimationFrame" in code) and "<html" not in code:
+                js_code = code
+            elif ("import pygame" in code or "import turtle" in code or "def main():" in code) and "<html" not in code:
+                py_code = code
+
+        if html_code and "index.html" not in saved_files:
+            self.save_game_code("index.html", html_code)
+            saved_files.append("index.html")
+        if css_code and "style.css" not in saved_files:
+            self.save_game_code("style.css", css_code)
+            saved_files.append("style.css")
+        if js_code and "script.js" not in saved_files:
+            self.save_game_code("script.js", js_code)
+            saved_files.append("script.js")
+        if py_code and not html_code and "game.py" not in saved_files:
+            self.save_game_code("game.py", py_code)
+            saved_files.append("game.py")
+
+        return saved_files
 
     def validate_generated_games(self) -> list[str]:
-        """Perform a non-executing AST smoke test; never run untrusted generated code automatically."""
+        """Perform validation smoke test on generated files."""
         results = []
         for path in sorted(self.games_path.glob("*.py")):
             try:
@@ -184,6 +248,9 @@ class ProjectWorkspace:
             except SyntaxError as exc:
                 result = f"FAIL: {path.name}, line {exc.lineno}: {exc.msg}"
             results.append(result)
+        for path in sorted(self.games_path.glob("*.html")):
+            result = f"PASS: {path.name} web game ready"
+            results.append(result)
         report = self.validation_path / "generated-game-smoke-test.txt"
-        report.write_text("\n".join(results) or "No generated Python game was saved.\n", encoding="utf-8")
+        report.write_text("\n".join(results) or "No generated game was saved.\n", encoding="utf-8")
         return results

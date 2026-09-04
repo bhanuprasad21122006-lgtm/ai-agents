@@ -9,6 +9,18 @@
 
 ---
 
+## 🎬 Demo Showcase
+
+> **From Prompt to Playable Game in Seconds:** Experience how the Multi-Agent AI Studio coordinates specialized agents to transform a prompt into a complete, polished, playable game with cyberpunk aesthetics, Web Audio API sound synthesis, responsive controls, and particle physics.
+
+<p align="center">
+  <img src="docs/assets/demo_gameplay.webp" alt="Multi-Agent AI Studio Playable Game Demo" width="750" style="border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.4);" />
+</p>
+
+> 🕹️ **Try the Generated Game:** Open [`snake_game/index.html`](snake_game/index.html) in any web browser to play locally with zero dependencies!
+
+---
+
 ## 🎯 Overview
 
 **Multi-Agent AI Studio Orchestrator** is an agentic AI application designed to simulate the collaboration of a multidisciplinary game-development team.

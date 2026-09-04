@@ -1,10 +1,12 @@
 from google.adk.agents import LlmAgent
+from typing import Optional
+from utils.models import get_active_model
 
 # ==========================================
 # PHASE 4-6: TECHNICAL & ASSETS
 # ==========================================
 
-def get_network_engineer() -> LlmAgent:
+def get_network_engineer(model: Optional[str] = None) -> LlmAgent:
     return LlmAgent(
         name="network_engineer",
         instruction="""
@@ -13,10 +15,10 @@ def get_network_engineer() -> LlmAgent:
         OUTPUT ARTIFACTS: Multiplayer protocol logic.
         VALIDATION RULES: Multiplayer sync integrity.
         """,
-        model="gemini-2.5-flash"
+        model=model or get_active_model()
     )
 
-def get_asset_manager() -> LlmAgent:
+def get_asset_manager(model: Optional[str] = None) -> LlmAgent:
     return LlmAgent(
         name="asset_manager",
         instruction="""
@@ -24,10 +26,10 @@ def get_asset_manager() -> LlmAgent:
         TASK OBJECTIVE: Coordinate 3D models, textures, animation pipelines.
         OUTPUT ARTIFACTS: Asset indexing and compression rules.
         """,
-        model="gemini-2.5-flash"
+        model=model or get_active_model()
     )
 
-def get_test_engineer() -> LlmAgent:
+def get_test_engineer(model: Optional[str] = None) -> LlmAgent:
     return LlmAgent(
         name="test_engineer",
         instruction="""
@@ -35,5 +37,5 @@ def get_test_engineer() -> LlmAgent:
         TASK OBJECTIVE: Run automated gameplay testing, regression tests, exploit detection.
         OUTPUT ARTIFACTS: Bug reports and stability metrics.
         """,
-        model="gemini-2.5-flash"
+        model=model or get_active_model()
     )
