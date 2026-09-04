@@ -91,8 +91,8 @@ If each stage is generated independently, downstream agents may receive incomple
 - **Phase-based orchestration**
 - **Structured artifact passing**
 - **Validation checkpoints**
-- **Sequential and parallel execution**
-- **Tool integration through MCP**
+- **Dependency-gated sequential execution**
+- **Optional filesystem tools through MCP**
 - **Downstream dependency awareness**
 
 ---
@@ -301,7 +301,7 @@ This provides a foundation for:
 
 # 🛠️ MCP Integration
 
-The project also integrates the **Model Context Protocol (MCP)** to allow agents to interact with external tools.
+The project supports the **Model Context Protocol (MCP)** as an optional local filesystem integration. Set `ENABLE_MCP=1` to enable it; MCP actions require confirmation. If the MCP server is unavailable, the pipeline continues with its built-in artifact tools.
 
 Instead of limiting agents to:
 
@@ -322,12 +322,10 @@ MCP
   │
   ├── Filesystem
   │
-  ├── Research
-  │
-  └── Other Tools
+  └── Confirmed local actions
 ```
 
-This is important because practical agentic systems require more than language generation—they need access to **tools, context, and external resources**.
+The MCP bridge is deliberately optional so an unavailable local server cannot prevent a project run from completing.
 
 ---
 
@@ -344,11 +342,10 @@ This is important because practical agentic systems require more than language g
 ### Supporting Components
 
 - Agent orchestration
-- Artifact validation
-- Filesystem interaction
-- Research/tool integration
+- JSON artifact schemas and phase-gate validation
+- Optional MCP filesystem interaction
 - Local execution
-- Generated artifact persistence
+- Persistent generated artifacts and run reports
 
 ---
 
@@ -362,6 +359,7 @@ ai-agents/
 │   └── ...
 │
 ├── utils/
+│   ├── artifacts.py
 │   ├── mcp_client.py
 │   └── validator.py
 │
@@ -425,6 +423,9 @@ Create a `.env` file:
 
 ```env
 GEMINI_API_KEY=your_api_key_here
+ENABLE_MCP=0
+MAX_PIPELINE_ATTEMPTS=2
+PIPELINE_TIMEOUT_SECONDS=900
 ```
 
 Do **not** commit your API key.
@@ -451,7 +452,9 @@ The repository includes model-related tests through:
 python test_models.py
 ```
 
-For production-level deployment, the next testing layer would include:
+Each pipeline run also writes a `validation/run-report.json` file with its attempt count, missing artifacts, fallback artifacts, and final status. Generated Python games receive a non-executing syntax smoke test before they are accepted.
+
+For production-level deployment, the next testing layer should include:
 
 - Agent-level unit tests
 - Schema validation tests
@@ -642,10 +645,9 @@ The same concepts can potentially be applied to:
 
 ### Short Term
 
-- [ ] Add structured schemas for all agent artifacts
-- [ ] Expand automated validation
-- [ ] Add retry and correction loops
-- [ ] Add centralized execution logs
+- [x] Add structured schemas for all agent artifacts
+- [x] Add phase-gated validation and recovery attempts
+- [x] Add persistent run events and validation reports
 - [ ] Add pipeline metrics
 
 ### Medium Term
