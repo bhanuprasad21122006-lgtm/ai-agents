@@ -1,22 +1,28 @@
 import os
-import tempfile
+from pathlib import Path
 from google.adk.agents import LlmAgent
 
+_workspace = None
+
+
+def set_project_workspace(workspace) -> None:
+    """Configure the durable output location for the current orchestration run."""
+    global _workspace
+    _workspace = workspace
+
 def write_game_code(filename: str, python_code: str) -> str:
-    """Saves the final playable game code into a temporary folder. Use this tool heavily to output code!
+    """Saves final playable game code into the current project's persistent game folder.
     Args:
         filename: name of the python file (e.g. game.py)
         python_code: the full, runnable python source code for the generated game
     """
-    temp_dir = tempfile.gettempdir()
-    filepath = os.path.join(temp_dir, filename)
-    with open(filepath, "w", encoding="utf-8") as f:
-        f.write(python_code)
-    
-    # Store the generated path in an environment variable so the main loop can find it
-    os.environ["GENERATED_GAME_PATH"] = filepath
-    
-    return f"Successfully saved runnable code to {filepath}"
+    if _workspace is None:
+        return "VALIDATION_FAILED: project workspace is not configured."
+    result = _workspace.save_game_code(filename, python_code)
+    if result.startswith("VALIDATION_PASSED"):
+        path = _workspace.games_path / (Path(filename).stem + ".py")
+        os.environ["GENERATED_GAME_PATH"] = str(path)
+    return result
 
 # ==========================================
 # PHASE 2: CORE SYSTEMS
@@ -32,7 +38,7 @@ def get_gameplay_programmer() -> LlmAgent:
         CRITICAL RULE: You MUST use the `write_game_code` tool to output your fully playable Python script (like pygame or turtle) so the user can play it locally! Do not just write text, use the tool.
         """,
         tools=[write_game_code],
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
 
 def get_ai_engineer() -> LlmAgent:

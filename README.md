@@ -200,6 +200,7 @@ Add API key
 
 ```env
 GEMINI_API_KEY=your_key_here
+ENABLE_MCP=0
 ```
 
 Run orchestrator
@@ -207,6 +208,8 @@ Run orchestrator
 ```bash
 python main.py
 ```
+
+Each run creates a durable folder under `generated_game/` containing agent artifacts, validation records, and any generated Python game. Set `ENABLE_MCP=1` only when you want agents to use the optional local filesystem MCP server; MCP actions request confirmation.
 
 Or launch desktop runner:
 

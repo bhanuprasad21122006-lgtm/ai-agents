@@ -13,7 +13,7 @@ def get_network_engineer() -> LlmAgent:
         OUTPUT ARTIFACTS: Multiplayer protocol logic.
         VALIDATION RULES: Multiplayer sync integrity.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
 
 def get_asset_manager() -> LlmAgent:
@@ -24,7 +24,7 @@ def get_asset_manager() -> LlmAgent:
         TASK OBJECTIVE: Coordinate 3D models, textures, animation pipelines.
         OUTPUT ARTIFACTS: Asset indexing and compression rules.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
 
 def get_test_engineer() -> LlmAgent:
@@ -35,5 +35,5 @@ def get_test_engineer() -> LlmAgent:
         TASK OBJECTIVE: Run automated gameplay testing, regression tests, exploit detection.
         OUTPUT ARTIFACTS: Bug reports and stability metrics.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )

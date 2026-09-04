@@ -13,7 +13,7 @@ def get_debugging_specialist() -> LlmAgent:
         INPUT DEPENDENCIES: Read bug reports from Test Engineer.
         OUTPUT ARTIFACTS: Patch suggestions.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
 
 def get_performance_optimizer() -> LlmAgent:
@@ -25,7 +25,7 @@ def get_performance_optimizer() -> LlmAgent:
         OUTPUT ARTIFACTS: Optimization reports.
         VALIDATION RULES: 60 FPS performance targets.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
 
 def get_live_ops_engineer() -> LlmAgent:
@@ -36,5 +36,5 @@ def get_live_ops_engineer() -> LlmAgent:
         TASK OBJECTIVE: Handle updates, analytics hooks, telemetry, patch rollout strategy.
         OUTPUT ARTIFACTS: Deployment pipelines.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )

@@ -17,3 +17,5 @@ __pycache__/
 
 # Logs
 *.log
+generated_game/*/
+!generated_game/.gitkeep

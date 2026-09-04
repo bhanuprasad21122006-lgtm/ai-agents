@@ -16,9 +16,10 @@ class PhaseValidator:
         # In a real ADK MCP scenario, this checks the generated artifact headers or AST.
         output_lower = str(output).lower()
         
-        if "error" in output_lower or "conflict" in output_lower:
-            print(f"⚠️ [VALIDATOR] {agent_name} output needs revision based on core restrictions.")
+        failure_markers = ("validation_failed", "unresolved error", "unresolved conflict")
+        if any(marker in output_lower for marker in failure_markers):
+            print(f"[VALIDATOR] {agent_name} output needs revision based on core restrictions.")
             return False
             
-        print(f"✅ [VALIDATOR] {agent_name} passed system validation rules.")
+        print(f"[VALIDATOR] {agent_name} passed system validation rules.")
         return True

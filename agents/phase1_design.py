@@ -14,7 +14,7 @@ def get_game_designer() -> LlmAgent:
         OUTPUT ARTIFACTS: GDD (Game Design Document), feature specs, balancing logic.
         VALIDATION RULES: Must be feasible within mobile performance limits.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
 
 def get_system_architect() -> LlmAgent:
@@ -27,5 +27,5 @@ def get_system_architect() -> LlmAgent:
         OUTPUT ARTIFACTS: System diagrams, service boundaries, integration contracts.
         VALIDATION RULES: Architecture must support mobile GPU constraints and 60 FPS targets.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )

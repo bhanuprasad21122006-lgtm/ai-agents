@@ -13,7 +13,7 @@ def get_graphics_engineer() -> LlmAgent:
         OUTPUT ARTIFACTS: Rendering pipeline configs.
         VALIDATION RULES: Optimization for mobile GPUs.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
 
 def get_ui_ux_designer() -> LlmAgent:
@@ -24,7 +24,7 @@ def get_ui_ux_designer() -> LlmAgent:
         TASK OBJECTIVE: Create menus, HUD systems, interaction flow, accessibility features.
         OUTPUT ARTIFACTS: UI wireframes and UI logic specifications.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
 
 def get_sound_engineer() -> LlmAgent:
@@ -35,5 +35,5 @@ def get_sound_engineer() -> LlmAgent:
         TASK OBJECTIVE: Implement spatial audio logic, weapon sound layers, ambient effects.
         OUTPUT ARTIFACTS: Audio trigger systems.
         """,
-        model="gemini-flash-latest"
+        model="gemini-2.5-flash"
     )
