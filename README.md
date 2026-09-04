@@ -211,6 +211,8 @@ python main.py
 
 Each run creates a durable folder under `generated_game/` containing agent artifacts, validation records, and any generated Python game. Set `ENABLE_MCP=1` only when you want agents to use the optional local filesystem MCP server; MCP actions request confirmation.
 
+For reliability, each agent must save a JSON artifact that passes a common schema. The pipeline uses phase gates, retries incomplete runs once by default, and writes `validation/run-report.json` with any missing or fallback artifacts. Configure `MAX_PIPELINE_ATTEMPTS` and `PIPELINE_TIMEOUT_SECONDS` in `.env` when needed.
+
 Or launch desktop runner:
 
 ```bash

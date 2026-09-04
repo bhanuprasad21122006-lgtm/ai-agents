@@ -25,7 +25,6 @@ from dotenv import load_dotenv
 from google.adk.agents import SequentialAgent
 
 # Import utilities
-from utils.validator import PhaseValidator
 from utils.artifacts import ProjectWorkspace
 from utils.mcp_client import MCPToolBridge
 
@@ -109,8 +108,12 @@ async def main():
     set_project_workspace(workspace)
     mcp_toolset = None
     if os.getenv("ENABLE_MCP", "0").lower() in {"1", "true", "yes"}:
-        mcp_toolset = MCPToolBridge(str(workspace.path.resolve())).create_toolset()
-        print("🔌 MCP filesystem tools enabled; each server action will require confirmation.")
+        try:
+            mcp_toolset = MCPToolBridge(str(workspace.path.resolve())).create_toolset()
+            print("🔌 MCP filesystem tools enabled; each server action will require confirmation.")
+        except Exception as exc:
+            workspace.record_event("mcp_unavailable", str(exc))
+            print(f"⚠️ MCP is unavailable; continuing with built-in artifact tools. ({exc})")
 
     def build_artifact_tools(agent_name):
         def read_upstream_artifacts() -> str:
@@ -144,9 +147,11 @@ async def main():
             agent.tools.append(mcp_toolset)
         agent.instruction += """
         EXECUTION PROTOCOL: First call read_upstream_artifacts to inspect earlier work. At the end, call
-        save_artifact with a concise, structured deliverable for your role. If it returns VALIDATION_FAILED,
-        revise the deliverable and save it again. Do not claim an artifact exists unless the save tool confirms it.
+        save_artifact with a JSON object containing exactly: title, summary, decisions, dependencies, risks,
+        and next_steps. If it returns VALIDATION_FAILED, revise the deliverable and save it again. Do not claim
+        an artifact exists unless the save tool confirms it. Phase gates prevent work that lacks prerequisites.
         """
+        agent.output_key = f"{agent.name}_final_output"
 
     print("🏗️ Building Agent Execution Graph...")
     phase_1 = SequentialAgent(sub_agents=[designer, architect], name="phase_1")
@@ -168,21 +173,51 @@ async def main():
         from google.adk.utils._debug_output import print_event
 
         session_svc = InMemorySessionService()
-        runner = Runner(
-            app_name="aaa_game_studio",
-            agent=studio_orchestrator,
-            session_service=session_svc,
-            auto_create_session=True
-        )
+        max_attempts = max(1, int(os.getenv("MAX_PIPELINE_ATTEMPTS", "2")))
+        timeout_seconds = max(60, int(os.getenv("PIPELINE_TIMEOUT_SECONDS", "900")))
+        timed_out = False
+        attempts = 0
 
-        message = types.Content(role='user', parts=[types.Part.from_text(text=user_prompt)])
+        async def run_attempt(message):
+            runner = Runner(
+                app_name="aaa_game_studio",
+                agent=studio_orchestrator,
+                session_service=session_svc,
+                auto_create_session=True,
+            )
+            async for event in runner.run_async(user_id="user_demo", session_id="session_demo", new_message=message):
+                print_event(event)
 
-        async for event in runner.run_async(
-            user_id="user_demo",
-            session_id="session_demo",
-            new_message=message
-        ):
-            print_event(event)
+        message = types.Content(role="user", parts=[types.Part.from_text(text=user_prompt)])
+        for attempts in range(1, max_attempts + 1):
+            workspace.record_event("pipeline_attempt", str(attempts))
+            try:
+                await asyncio.wait_for(run_attempt(message), timeout=timeout_seconds)
+            except asyncio.TimeoutError:
+                timed_out = True
+                workspace.record_event("pipeline_timeout", str(timeout_seconds))
+                print(f"\n⚠️ Pipeline attempt timed out after {timeout_seconds}s.")
+                break
+            missing = workspace.missing_agents()
+            if not missing:
+                break
+            if attempts < max_attempts:
+                print(f"\n⚠️ Missing artifacts from: {', '.join(missing)}. Starting automatic recovery attempt...")
+                message = types.Content(
+                    role="user",
+                    parts=[types.Part.from_text(text=(
+                        "Recovery pass: create the missing validated artifacts only. "
+                        f"Missing agents: {', '.join(missing)}. Follow all phase gates and JSON schema exactly."
+                    ))],
+                )
+
+        # Preserve final responses for review after all automated recovery attempts, never silently discard them.
+        session = await session_svc.get_session(app_name="aaa_game_studio", user_id="user_demo", session_id="session_demo")
+        if session:
+            for agent_name in workspace.missing_agents():
+                workspace.save_captured_output(agent_name, session.state.get(f"{agent_name}_final_output", ""))
+        run_report = workspace.write_run_report(attempts, timed_out)
+        print(f"[RUN REPORT] {run_report['status']}; attempts={attempts}; missing={len(run_report['missing_agents'])}; fallbacks={len(run_report['fallback_agents'])}")
 
         print("\n✅ Game Generation Complete! Durable artifacts have been saved to the project folder.")
         smoke_results = workspace.validate_generated_games()
@@ -224,6 +259,8 @@ async def main():
         print(f"📁 Run output: {workspace.path}")
 
     except Exception as e:
+        workspace.record_event("execution_error", repr(e))
+        workspace.write_run_report(0)
         print(f"\n❌ Execution Error: {e}")
         import traceback
         traceback.print_exc()
