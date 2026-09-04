@@ -1,219 +1,441 @@
-# AAA Game Studio Multi-Agent Orchestrator
+# 🤖 Multi-Agent AI Studio Orchestrator
 
-An AI-powered **14-agent collaborative development pipeline** that simulates a full AAA game studio workflow using **Google ADK**, **Gemini 3.1 Flash**, and **Model Context Protocol (MCP)**.
+> **An agentic AI system that coordinates 14 specialized AI agents across a 9-phase production workflow to transform a high-level game concept into a structured, validated development plan.**
 
-This system demonstrates how specialized agents can replace traditional studio roles and coordinate end-to-end game production planning automatically.
-
----
-
-# Problem Statement
-
-AAA game development requires large multidisciplinary teams:
-
-* Designers
-* Programmers
-* AI engineers
-* Artists
-* Network engineers
-* Testers
-* Performance specialists
-* Live operations teams
-
-Early-stage prototyping is slow, expensive, and coordination-heavy.
-
-This project solves that by orchestrating **autonomous role-specific agents** into a structured production pipeline.
+[![Python](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
+[![Google ADK](https://img.shields.io/badge/Google%20ADK-Agentic%20AI-orange)](https://google.github.io/adk-docs/)
+[![Gemini](https://img.shields.io/badge/LLM-Gemini-blue)](https://ai.google.dev/)
+[![MCP](https://img.shields.io/badge/Protocol-MCP-purple)](https://modelcontextprotocol.io/)
 
 ---
 
-# Solution
+## 🎯 Overview
 
-We built a **multi-agent orchestration engine** that simulates a professional studio workflow across **9 production phases** using 14 specialized AI agents.
+**Multi-Agent AI Studio Orchestrator** is an agentic AI application designed to simulate the collaboration of a multidisciplinary game-development team.
 
-Each agent:
+Instead of asking a single LLM to solve an entire problem, the system decomposes the workflow into **specialized roles**, assigns each responsibility to an AI agent, orchestrates dependencies between agents, validates generated artifacts, and passes approved outputs to downstream stages.
 
-* owns a production responsibility
-* produces structured artifacts
-* validates upstream outputs
-* hands off results downstream
-
-The result is a complete AI-driven game production lifecycle planner.
-
----
-
-# Key Features
-
-✅ 14 specialized studio-role agents
-✅ Phase-based AAA production workflow
-✅ Sequential + parallel agent orchestration
-✅ MCP tool integration for filesystem + research
-✅ Validation checkpoints between pipeline stages
-✅ Local desktop execution support
-✅ Gemini-powered reasoning agents
-
----
-
-# Agent Roles
-
-The system simulates a real AAA studio structure:
-
-### Phase 1 — Design
-
-Game Designer
-System Architect
-
-### Phase 2 — Gameplay Logic
-
-Gameplay Programmer
-AI Engineer
-Level Designer
-
-### Phase 3 — Player Experience
-
-Graphics Engineer
-UI/UX Designer
-Sound Engineer
-
-### Phase 4–6 — Infrastructure
-
-Network Engineer
-Asset Manager
-Test Engineer
-
-### Phase 7–9 — Optimization & Deployment
-
-Debugging Specialist
-Performance Optimizer
-Live Ops Engineer
-
----
-
-# Architecture Overview
-
-Pipeline execution:
+### The core idea
 
 ```text
-Concept Input
-   ↓
-Design Agents
-   ↓
-Gameplay Agents
-   ↓
-Visual & UX Agents
-   ↓
-Infrastructure Agents
-   ↓
-Testing Layer
-   ↓
-Debugging Layer
-   ↓
-Optimization Layer
-   ↓
-Live Deployment Strategy
+                    GAME CONCEPT
+                         │
+                         ▼
+              ┌────────────────────┐
+              │   Orchestrator     │
+              └─────────┬──────────┘
+                        │
+           ┌────────────┼────────────┐
+           ▼            ▼            ▼
+       Design       Gameplay       AI
+       Agents        Agents       Agents
+           │            │            │
+           └────────────┼────────────┘
+                        ▼
+                 Player Experience
+                        │
+                        ▼
+                Infrastructure
+                        │
+                        ▼
+                    Testing
+                        │
+                        ▼
+                   Debugging
+                        │
+                        ▼
+                  Optimization
+                        │
+                        ▼
+                  Live Operations
+                        │
+                        ▼
+              VALIDATED PRODUCTION PLAN
 ```
 
-Agents communicate through structured artifact passing and validation loops.
+The project demonstrates how **LLM-based agents can be composed into a dependency-aware workflow rather than being used as isolated chatbots.**
 
 ---
 
-# Tech Stack
+# 💡 Problem
 
-Core Technologies:
+Complex software and game-production workflows involve multiple disciplines.
 
-Python
-Google ADK
-Gemini 3.1 Flash
-Model Context Protocol (MCP)
-python-dotenv
+A single AI assistant can generate ideas, but it struggles to reliably represent the responsibilities, dependencies, validation requirements, and handoffs that exist between specialized roles.
 
-Optional Extensions:
-
-filesystem MCP server
-search MCP server
-artifact persistence tools
-
----
-
-# Project Structure
+For example:
 
 ```text
-ai_agent/
+Game Design
+     ↓
+System Architecture
+     ↓
+Gameplay Logic
+     ↓
+AI Behavior
+     ↓
+Level Design
+     ↓
+Networking
+     ↓
+Testing
+     ↓
+Optimization
+```
+
+If each stage is generated independently, downstream agents may receive incomplete, contradictory, or unusable information.
+
+### This project addresses that problem through:
+
+- **Role specialization**
+- **Phase-based orchestration**
+- **Structured artifact passing**
+- **Validation checkpoints**
+- **Sequential and parallel execution**
+- **Tool integration through MCP**
+- **Downstream dependency awareness**
+
+---
+
+# 🧠 Solution
+
+The system models a virtual production team consisting of **14 specialized AI agents** distributed across **9 workflow phases**.
+
+Each agent has a defined responsibility and produces an output that can be consumed by other agents.
+
+### Agent lifecycle
+
+```text
+Receive Context
+      │
+      ▼
+Analyze Responsibility
+      │
+      ▼
+Generate Artifact
+      │
+      ▼
+Validate Output
+      │
+ ┌────┴────┐
+ │         │
+PASS      FAIL
+ │         │
+ ▼         ▼
+Next      Retry /
+Stage     Correction
+```
+
+This architecture makes the system closer to an **agentic workflow engine** than a conventional LLM application.
+
+---
+
+# 🏗️ System Architecture
+
+```text
+┌──────────────────────────────────────────────────────────────┐
+│                         USER INPUT                           │
+│                    Game / Product Concept                    │
+└─────────────────────────────┬────────────────────────────────┘
+                              │
+                              ▼
+┌──────────────────────────────────────────────────────────────┐
+│                       ORCHESTRATOR                           │
+│                                                              │
+│  • Phase management                                          │
+│  • Agent coordination                                        │
+│  • Context propagation                                       │
+│  • Execution control                                         │
+└─────────────────────────────┬────────────────────────────────┘
+                              │
+                              ▼
+                 ┌──────────────────────┐
+                 │     DESIGN PHASE     │
+                 │                      │
+                 │ Game Designer        │
+                 │ System Architect     │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │   GAMEPLAY PHASE     │
+                 │                      │
+                 │ Gameplay Programmer  │
+                 │ AI Engineer          │
+                 │ Level Designer       │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ PLAYER EXPERIENCE    │
+                 │                      │
+                 │ Graphics Engineer    │
+                 │ UI/UX Designer       │
+                 │ Sound Engineer       │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ INFRASTRUCTURE       │
+                 │                      │
+                 │ Network Engineer     │
+                 │ Asset Manager        │
+                 │ Test Engineer        │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │ OPTIMIZATION         │
+                 │                      │
+                 │ Debugging Specialist │
+                 │ Performance Engineer │
+                 │ Live Ops Engineer    │
+                 └──────────┬───────────┘
+                            │
+                            ▼
+                 ┌──────────────────────┐
+                 │  FINAL ARTIFACT SET  │
+                 └──────────────────────┘
+```
+
+---
+
+# 👥 Multi-Agent Team
+
+The system contains **14 specialized agents**.
+
+| Phase | Agent | Responsibility |
+|---|---|---|
+| 1 | Game Designer | Game vision, mechanics, player experience |
+| 1 | System Architect | Technical architecture and system boundaries |
+| 2 | Gameplay Programmer | Gameplay systems and implementation planning |
+| 2 | AI Engineer | NPC behavior and AI architecture |
+| 2 | Level Designer | Level structure and progression |
+| 3 | Graphics Engineer | Rendering and visual pipeline |
+| 3 | UI/UX Designer | Interface and interaction design |
+| 3 | Sound Engineer | Audio systems and sound design |
+| 4 | Network Engineer | Multiplayer architecture and synchronization |
+| 5 | Asset Manager | Asset organization and production requirements |
+| 6 | Test Engineer | Test strategy and quality requirements |
+| 7 | Debugging Specialist | Failure analysis and debugging strategy |
+| 8 | Performance Optimizer | Performance and scalability planning |
+| 9 | Live Ops Engineer | Deployment and live-service strategy |
+
+---
+
+# 🔄 Workflow
+
+The orchestrator processes a high-level concept through multiple dependent stages.
+
+### Example input
+
+```text
+Build a multiplayer tactical extraction game
+set in a post-apocalyptic environment.
+```
+
+### The system transforms this into structured outputs such as:
+
+```text
+Game Design Specification
+        ↓
+System Architecture
+        ↓
+Gameplay Architecture
+        ↓
+NPC / AI Behavior
+        ↓
+Level Design
+        ↓
+Graphics & UX Strategy
+        ↓
+Networking Model
+        ↓
+Testing Strategy
+        ↓
+Debugging Plan
+        ↓
+Performance Strategy
+        ↓
+Live Operations Plan
+```
+
+The important distinction is that downstream agents can use outputs from earlier stages rather than starting from an empty context.
+
+---
+
+# 🔐 Artifact-Based Communication
+
+One of the key design decisions is to treat agent outputs as **artifacts** rather than passing arbitrary conversational text between agents.
+
+Conceptually:
+
+```text
+Agent A
+   │
+   ▼
+Structured Artifact
+   │
+   ▼
+Validator
+   │
+ ┌─┴──────────────┐
+ │                │
+VALID           INVALID
+ │                │
+ ▼                ▼
+Agent B       Correction /
+              Retry
+```
+
+This provides a foundation for:
+
+- Traceability
+- Validation
+- Reproducibility
+- Debugging
+- Downstream context propagation
+- Future persistence and versioning
+
+---
+
+# 🛠️ MCP Integration
+
+The project also integrates the **Model Context Protocol (MCP)** to allow agents to interact with external tools.
+
+Instead of limiting agents to:
+
+```text
+LLM → Text Response
+```
+
+the architecture supports:
+
+```text
+Agent
+  │
+  ▼
+Tool Request
+  │
+  ▼
+MCP
+  │
+  ├── Filesystem
+  │
+  ├── Research
+  │
+  └── Other Tools
+```
+
+This is important because practical agentic systems require more than language generation—they need access to **tools, context, and external resources**.
+
+---
+
+# ⚙️ Technology Stack
+
+### Core
+
+- **Python**
+- **Google Agent Development Kit (ADK)**
+- **Gemini**
+- **Model Context Protocol (MCP)**
+- **python-dotenv**
+
+### Supporting Components
+
+- Agent orchestration
+- Artifact validation
+- Filesystem interaction
+- Research/tool integration
+- Local execution
+- Generated artifact persistence
+
+---
+
+# 📂 Project Structure
+
+```text
+ai-agents/
 │
 ├── agents/
+│   ├── ...
+│   └── ...
+│
 ├── utils/
 │   ├── mcp_client.py
 │   └── validator.py
 │
+├── build/
+│   └── GameBuilder/
+│
+├── generated_game/
+│
+├── dist/
+│
 ├── main.py
 ├── requirements.txt
 ├── .env.example
-└── run_builder.bat
+│
+├── GameBuilder.spec
+├── build_executable.bat
+├── run_builder.bat
+│
+├── implementation_plan.md
+├── task.md
+├── walkthrough.md
+└── test_models.py
 ```
 
 ---
 
-# How It Works
+# 🚀 Getting Started
 
-Step 1:
-
-User provides a game concept
-
-Example:
-
-```text
-Build a tactical multiplayer shooter similar to Arena Breakout
-```
-
-Step 2:
-
-Agents execute phase-by-phase planning
-
-Step 3:
-
-System generates:
-
-* gameplay architecture
-* AI behavior structure
-* rendering strategy
-* networking model
-* testing pipeline
-* optimization roadmap
-* deployment lifecycle plan
-
----
-
-# Installation
-
-Clone repository
+## 1. Clone the repository
 
 ```bash
-git clone <repo-url>
-cd ai_agent
+git clone https://github.com/bhanuprasad21122006-lgtm/ai-agents.git
+cd ai-agents
 ```
 
-Install dependencies
+## 2. Create a virtual environment
+
+### Windows
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+### macOS / Linux
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+## 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Add API key
+## 4. Configure environment variables
+
+Create a `.env` file:
 
 ```env
-GEMINI_API_KEY=your_key_here
-ENABLE_MCP=0
+GEMINI_API_KEY=your_api_key_here
 ```
 
-Run orchestrator
+Do **not** commit your API key.
+
+## 5. Run the orchestrator
 
 ```bash
 python main.py
 ```
 
-Each run creates a durable folder under `generated_game/` containing agent artifacts, validation records, and any generated Python game. Set `ENABLE_MCP=1` only when you want agents to use the optional local filesystem MCP server; MCP actions request confirmation.
-
-For reliability, each agent must save a JSON artifact that passes a common schema. The pipeline uses phase gates, retries incomplete runs once by default, and writes `validation/run-report.json` with any missing or fallback artifacts. Configure `MAX_PIPELINE_ATTEMPTS` and `PIPELINE_TIMEOUT_SECONDS` in `.env` when needed.
-
-Or launch desktop runner:
+On Windows, the project also includes:
 
 ```bash
 run_builder.bat
@@ -221,126 +443,307 @@ run_builder.bat
 
 ---
 
-# Innovation Highlights
+# 🧪 Testing
 
-This project demonstrates:
+The repository includes model-related tests through:
 
-Multi-role agent collaboration
-Studio-grade workflow simulation
-Phase-aware reasoning pipelines
-Validation-enforced artifact passing
-Local-first orchestration execution
-
-Unlike single-agent copilots, this system models **organizational intelligence instead of isolated responses**.
-
----
-
-# Example Output Pipeline
-
-Input:
-
-```text
-Multiplayer tactical extraction shooter
+```bash
+python test_models.py
 ```
 
-Generated outputs:
+For production-level deployment, the next testing layer would include:
 
-Game design specification
-System architecture layout
-NPC decision logic
-Level structure plans
-Graphics pipeline strategy
-Multiplayer sync model
-Test coverage framework
-Performance optimization roadmap
-Live service deployment plan
+- Agent-level unit tests
+- Schema validation tests
+- Orchestration integration tests
+- Failure/retry tests
+- End-to-end pipeline tests
+- LLM output evaluation
 
 ---
 
-# Use Cases
+# 📊 Engineering Challenges
 
-Rapid game prototyping
-AI research experimentation
-Studio workflow simulation
-Game design education
-Multi-agent orchestration demonstrations
+Building a multi-agent system introduces problems that do not exist in a simple LLM application.
+
+### 1. Context consistency
+
+Every downstream agent needs enough information from upstream stages without receiving irrelevant context.
+
+### 2. Output reliability
+
+LLM outputs are probabilistic, so downstream components cannot blindly assume that generated artifacts are correct.
+
+### 3. Agent coordination
+
+The workflow needs explicit sequencing and dependency management.
+
+### 4. Failure handling
+
+A single invalid artifact can propagate errors through multiple downstream stages.
+
+### 5. Tool interaction
+
+Agents need controlled access to external capabilities rather than unrestricted tool execution.
+
+These challenges make orchestration, validation, and observability important parts of the architecture.
 
 ---
 
-# Future Improvements
+# 🔬 What This Project Demonstrates
 
-Unity export adapters
-Unreal integration layer
-asset auto-generation agents
-distributed execution support
-reinforcement feedback loops
-automated playtesting agents
+This project demonstrates practical experience with:
+
+### Generative AI
+
+- LLM integration
+- Prompt-driven task specialization
+- Structured generation
+- Context management
+
+### Agentic AI
+
+- Multi-agent architecture
+- Agent specialization
+- Workflow orchestration
+- Agent-to-agent handoffs
+- Tool-using agents
+
+### Software Engineering
+
+- Modular architecture
+- Separation of concerns
+- Validation layers
+- Error handling
+- Testing
+- Configuration management
+
+### AI Systems Engineering
+
+- Artifact-based pipelines
+- Dependency-aware execution
+- External tool integration
+- LLM reliability considerations
 
 ---
 
-# Impact
+# 🆚 Single-Agent vs Multi-Agent Architecture
 
-This project shows how coordinated AI agents can simulate complex production teams and reduce early-stage development planning time from **weeks to minutes**.
+A major motivation behind this project is understanding when a single-agent architecture becomes insufficient.
 
-It serves as a blueprint for future **autonomous software production studios**.
+### Traditional approach
+
+```text
+User
+ │
+ ▼
+One LLM
+ │
+ ▼
+Large unstructured response
+```
+
+### This project
+
+```text
+                         User
+                          │
+                          ▼
+                     Orchestrator
+                          │
+        ┌─────────────────┼─────────────────┐
+        ▼                 ▼                 ▼
+      Design           Gameplay             AI
+       Agent             Agents           Agents
+        │                 │                 │
+        └─────────────────┼─────────────────┘
+                          ▼
+                      Validator
+                          │
+                          ▼
+                    Next Phase
+```
+
+The goal is not to claim that multi-agent systems are always better.
+
+Instead, this project explores how **specialization, explicit dependencies, validation, and tool use can be combined to solve complex workflows.**
 
 ---
-# 2-Minute Demo Pitch Script — AAA Game Studio Multi-Agent Orchestrator
 
-Hello everyone,
+# 📈 Evaluation Roadmap
 
-Game development at the AAA level normally requires large multidisciplinary teams — designers, programmers, AI engineers, artists, testers, network specialists, and live-operations staff. Coordinating these roles takes months before a playable prototype even exists.
+A future version of the project will measure the system quantitatively.
 
-So we asked a simple question:
+Potential metrics include:
 
-What if a studio pipeline itself could be automated using AI agents?
+| Metric | Purpose |
+|---|---|
+| Pipeline execution time | Measure workflow efficiency |
+| Agent success rate | Measure reliability |
+| Validation pass rate | Measure artifact quality |
+| Retry rate | Identify unstable agents |
+| Token usage | Measure model efficiency |
+| Cost per run | Estimate operational cost |
+| End-to-end completion rate | Measure pipeline reliability |
 
-To solve this, we built the **AAA Game Studio Multi-Agent Orchestrator** — a system that simulates a professional game studio using **14 specialized AI agents** powered by **Gemini 3.1 Flash** and coordinated through **Google ADK**.
+This evaluation layer is important because an agent system should be judged by **measurable outcomes**, not simply by the number of agents it contains.
 
-Instead of a single assistant generating ideas, our system assigns structured responsibilities across nine production phases:
+---
 
-Design
-Gameplay logic
-AI behavior
-Graphics and UI
-Networking
-Asset coordination
-Testing
-Optimization
-Live deployment planning
+# 🎥 Demo
 
-Each agent produces artifacts and passes them forward through validation checkpoints, exactly like a real production pipeline.
+> **Add a short 60–90 second screen recording here.**
 
-For example, when we input:
+Recommended demo sequence:
 
-“Build a tactical multiplayer extraction shooter”
+```text
+1. Enter game concept
+        ↓
+2. Start orchestration
+        ↓
+3. Show agents executing
+        ↓
+4. Show artifact generation
+        ↓
+5. Show validation
+        ↓
+6. Show downstream handoff
+        ↓
+7. Show final generated outputs
+```
 
-our agents automatically generate:
+A working demo is intentionally prioritized over screenshots of code because it lets reviewers understand the system within seconds.
 
-a gameplay architecture
-NPC behavior logic
-level structure planning
-graphics pipeline strategy
-network synchronization models
-testing frameworks
-performance optimization plans
-and a live-operations roadmap
+---
 
-All executed locally as a coordinated orchestration workflow.
+# 💼 Why This Project Matters
 
-Technically, this project demonstrates:
+This project was built to explore a broader engineering question:
 
-multi-agent collaboration
-phase-aware execution pipelines
-artifact-based validation loops
-Model Context Protocol tool integration
-and studio-grade workflow simulation
+> **How can complex workflows be decomposed into specialized AI agents while maintaining structure, validation, and reliable information flow?**
 
-This transforms early-stage game planning from a manual multi-week effort into an automated multi-minute pipeline.
+The game-development domain provides a useful demonstration because it naturally contains multiple specialized roles and dependencies.
 
-Our long-term vision is simple:
+However, the underlying architecture is not limited to games.
 
-AI won’t just assist developers — it will simulate entire production teams.
+The same concepts can potentially be applied to:
 
-Thank you.
+- Software development workflows
+- Product planning
+- Research pipelines
+- Content production
+- QA automation
+- Technical documentation
+- Business process automation
 
+---
+
+# 🔮 Future Development
+
+### Short Term
+
+- [ ] Add structured schemas for all agent artifacts
+- [ ] Expand automated validation
+- [ ] Add retry and correction loops
+- [ ] Add centralized execution logs
+- [ ] Add pipeline metrics
+
+### Medium Term
+
+- [ ] Add persistent project state
+- [ ] Add agent execution dashboard
+- [ ] Add human approval checkpoints
+- [ ] Add configurable workflows
+- [ ] Add evaluation benchmarks
+
+### Long Term
+
+- [ ] Unity integration
+- [ ] Unreal Engine integration
+- [ ] Automated asset-generation pipeline
+- [ ] Automated playtesting agents
+- [ ] Distributed agent execution
+- [ ] Reinforcement/feedback-based optimization
+
+---
+
+# ⚠️ Current Limitations
+
+This project is primarily a **planning and orchestration system**, not a replacement for a complete AAA game-development team or game engine.
+
+Current limitations include:
+
+- LLM outputs remain probabilistic.
+- Generated plans require human review.
+- Agent quality depends on model capability and prompt design.
+- Large workflows can increase token usage and execution cost.
+- Quantitative evaluation and large-scale benchmarking are still areas for improvement.
+- The current system does not automatically produce a production-ready commercial game.
+
+These limitations are important because reliable AI systems require **evaluation and human oversight**, not only generation.
+
+---
+
+# 🧑‍💻 Skills Demonstrated
+
+```text
+Python
+├── Modular application design
+├── API integration
+├── Environment configuration
+└── Testing
+
+Generative AI
+├── Gemini
+├── Prompt engineering
+├── Structured outputs
+└── Context management
+
+Agentic AI
+├── Multi-agent systems
+├── Agent orchestration
+├── Workflow design
+├── Artifact passing
+└── Validation
+
+MCP
+├── Tool integration
+├── Filesystem interaction
+└── External context access
+
+Software Architecture
+├── Separation of concerns
+├── Pipeline design
+├── Dependency management
+└── Error handling
+```
+
+---
+
+# 🏆 Key Takeaway
+
+**Multi-Agent AI Studio Orchestrator is an exploration of agentic software architecture—not simply an LLM wrapper.**
+
+The project combines:
+
+> **LLMs + specialized agents + orchestration + structured artifacts + validation + tool use**
+
+to demonstrate how AI systems can be designed to participate in complex, multi-stage workflows.
+
+---
+
+# 👨‍💻 Author
+
+**Bhanu Prasad**
+
+CSE Student | AI & Software Engineering
+
+### GitHub
+
+[github.com/bhanuprasad21122006-lgtm](https://github.com/bhanuprasad21122006-lgtm)
+
+---
+
+# 📄 License
+
+Add your preferred open-source license before publishing this repository for broader reuse.
