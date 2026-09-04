@@ -6,6 +6,7 @@
 [![Google ADK](https://img.shields.io/badge/Google%20ADK-Agentic%20AI-orange)](https://google.github.io/adk-docs/)
 [![Gemini](https://img.shields.io/badge/LLM-Gemini-blue)](https://ai.google.dev/)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-purple)](https://modelcontextprotocol.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
@@ -742,4 +743,4 @@ CSE Student | AI & Software Engineering
 
 # 📄 License
 
-Add your preferred open-source license before publishing this repository for broader reuse.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
