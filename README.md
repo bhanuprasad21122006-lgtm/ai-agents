@@ -593,32 +593,6 @@ This evaluation layer is important because an agent system should be judged by *
 
 ---
 
-# 🎥 Demo
-
-> **Add a short 60–90 second screen recording here.**
-
-Recommended demo sequence:
-
-```text
-1. Enter game concept
-        ↓
-2. Start orchestration
-        ↓
-3. Show agents executing
-        ↓
-4. Show artifact generation
-        ↓
-5. Show validation
-        ↓
-6. Show downstream handoff
-        ↓
-7. Show final generated outputs
-```
-
-A working demo is intentionally prioritized over screenshots of code because it lets reviewers understand the system within seconds.
-
----
-
 # 💼 Why This Project Matters
 
 This project was built to explore a broader engineering question:
